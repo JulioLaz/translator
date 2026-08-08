@@ -1,0 +1,21 @@
+# Archivos específicos
+benchmark_traductor_resultados.csv
+main_benchmark_traductor.py
+
+# Entornos
+.env
+.venv/
+
+# Caché y dependencias
+__pycache__/
+piper/
+whisper-blas-bin-x64/
+# Archivos generados
+*.wav
+*.dll
+*.onnx
+*.exe
+*.bin
+
+# JSON generados (ajusta si necesitas conservar algunos)
+*.json
