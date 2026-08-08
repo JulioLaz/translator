@@ -3,14 +3,16 @@
 TTS - TEXT TO SPEECH - AGENTE TRADUCTOR
 =============================================================
 Convierte texto a audio WAV usando Piper TTS local.
-Detecta automáticamente el idioma por palabras clave
-para seleccionar la voz correcta (ES o EN).
+El idioma de síntesis (ES o EN) lo recibe como parámetro desde
+el pipeline (ya lo determinó Whisper en el paso de STT).
 =============================================================
-Versión: 1.1.0
+Versión: 1.2.0
 Cambios:
   1.0.0 - Versión inicial con Piper TTS
   1.1.0 - Detección de idioma mejorada por palabras clave
           reemplaza detección por caracteres especiales
+  1.2.0 - Se elimina la re-detección por palabras clave; el
+          idioma ahora se pasa explícitamente desde el pipeline
 =============================================================
 '''
 
@@ -23,42 +25,13 @@ PIPER_EXE = r'C:\JulioPrograma\agente_traductor\piper\piper_windows_amd64\piper\
 VOZ_ES = r'C:\JulioPrograma\agente_traductor\piper\piper_windows_amd64\piper\es_ES-davefx-medium.onnx'
 # VOZ_EN = r'C:\JulioPrograma\agente_traductor\piper\piper_windows_amd64\piper\en_US-lessac-medium.onnx'
 VOZ_EN = r'C:\JulioPrograma\agente_traductor\piper\piper_windows_amd64\piper\en_US-ryan-medium.onnx'
-# === VOCABULARIO PARA DETECCIÓN DE IDIOMA ===
-PALABRAS_ES = {
-    'el', 'la', 'los', 'las', 'es', 'en', 'de', 'que', 'y',
-    'un', 'una', 'por', 'con', 'se', 'su', 'al', 'del', 'yo',
-    'mi', 'me', 'no', 'si', 'soy', 'tengo', 'quiero', 'hola',
-    'como', 'para', 'pero', 'hay', 'mas', 'muy', 'bien', 'todo',
-    'este', 'esta', 'son', 'ser', 'fue', 'han', 'tiene', 'hacer'
-}
-
-PALABRAS_EN = {
-    'the', 'is', 'are', 'in', 'of', 'and', 'to', 'a', 'an',
-    'i', 'my', 'me', 'you', 'he', 'she', 'we', 'it', 'this',
-    'that', 'for', 'with', 'am', 'have', 'want', 'hello', 'hi',
-    'was', 'been', 'has', 'can', 'will', 'not', 'but', 'from',
-    'they', 'all', 'its', 'our', 'your', 'her', 'his', 'do'
-}
-
-
-def detectar_idioma(texto):
-    """
-    Detecta si el texto es español o inglés por palabras clave.
-    Retorna: 'es' o 'en'
-    """
-    tokens = set(texto.lower().split())
-    score_es = len(tokens & PALABRAS_ES)
-    score_en = len(tokens & PALABRAS_EN)
-    return 'es' if score_es >= score_en else 'en'
-
-
-def sintetizar(texto):
+def sintetizar(texto, idioma):
     """
     Convierte texto a audio WAV usando Piper TTS.
-    Detecta automáticamente el idioma y selecciona la voz correcta.
+    idioma: 'es' o 'en', el idioma del texto a sintetizar (ya conocido
+    por el pipeline, no se re-detecta acá).
     Retorna: path al archivo WAV generado
     """
-    idioma = detectar_idioma(texto)
     voz = VOZ_ES if idioma == 'es' else VOZ_EN
 
     if not os.path.exists(voz):

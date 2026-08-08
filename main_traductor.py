@@ -50,7 +50,7 @@ def procesar_turno():
 
         # PASO 2: Transcribir
         t0 = time.time()
-        texto = transcribir(wav_entrada)
+        texto, idioma_origen = transcribir(wav_entrada)
         if not texto:
             print("⚠️  No se pudo transcribir. Intentá de nuevo.")
             return
@@ -58,15 +58,16 @@ def procesar_turno():
 
         # PASO 3: Traducir
         t1 = time.time()
-        traduccion = traducir(texto)
+        traduccion = traducir(texto, idioma_origen)
         if not traduccion:
             print("⚠️  No se pudo traducir. Intentá de nuevo.")
             return
         t_trad = time.time() - t1
 
         # PASO 4: Sintetizar voz
+        idioma_destino = 'en' if idioma_origen == 'es' else 'es'
         t2 = time.time()
-        wav_salida = sintetizar(traduccion)
+        wav_salida = sintetizar(traduccion, idioma_destino)
         if not wav_salida:
             print("⚠️  No se pudo sintetizar audio.")
             return

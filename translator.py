@@ -5,48 +5,40 @@ TRANSLATOR - AGENTE TRADUCTOR
 Traduce texto entre español e inglés usando Qwen2.5 1.5B
 corriendo localmente via Ollama.
 =============================================================
-Versión: 1.0.0
+Versión: 1.1.0
 Cambios:
   1.0.0 - Versión inicial con Ollama API local
+  1.1.0 - Traducción bidireccional ES<->EN explícita según el
+          idioma_origen recibido (antes solo traducía ES->EN)
 =============================================================
 '''
 
 import requests
-import json
 
 # === CONFIGURACIÓN OLLAMA ===
 OLLAMA_URL = 'http://localhost:11434/api/generate'
 MODELO = 'qwen2.5:1.5b'
-# MODELO = 'qwen2.5:1.5b'
-# MODELO = 'gemma3:1b'
 TIMEOUT = 30  # segundos
 
-def traducir(texto):
-    instruccion = f'''You are a translator. If the following text is in Spanish, translate it to English. Return ONLY the translation, nothing else:
+IDIOMAS = {'es': 'Spanish', 'en': 'English'}
+
+
+def traducir(texto, idioma_origen):
+    """
+    Traduce texto entre español e inglés.
+    idioma_origen: 'es' o 'en'. El destino es el otro idioma soportado.
+    """
+    idioma_destino = 'en' if idioma_origen == 'es' else 'es'
+    instruccion = f'''You are a translator. Translate the following text from {IDIOMAS[idioma_origen]} to {IDIOMAS[idioma_destino]}. Return ONLY the translation, nothing else:
 
 {texto}'''
-    # instruccion = f'''You are a translator. If the following text is in Spanish, translate it to English. If it is in English, translate it to Spanish. Return ONLY the translation, nothing else:
 
-#     instruccion = f'''You are a professional translator specialized in Data Science, Business Intelligence and retail analytics. 
-
-# Context: The speaker is a Data Scientist and BI Lead working for a supermarket chain in Argentina. Topics include: demand forecasting, inventory analysis, dashboards, SQL, Python, LightGBM, supplier management, stock analysis, sales tickets, KPIs.
-
-# Translation rules:
-# - Keep technical terms in English when commonly used as-is: pipeline, dashboard, forecast, KPI, dataframe, query, script, deploy
-# - Translate domain terms naturally: sucursal=branch, pronóstico=forecast, stock dormido=dormant stock, proveedor=supplier
-# - If Spanish → translate to English. If English → translate to Spanish.
-# - Return ONLY the translation, nothing else.
-
-# Text:
-# {texto}'''
-
-    print(f"🔄 Traduciendo...")
+    print(f"🔄 Traduciendo ({idioma_origen} → {idioma_destino})...")
 
     payload = {
         'model': MODELO,
         'prompt': instruccion,
         'stream': False,
-        # 'stream': False,
         'options': {
             'temperature': 0.1,
             'num_predict': 200,
